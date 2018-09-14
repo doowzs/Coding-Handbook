@@ -1,2 +1,2 @@
-# Problem-Solving-OJ-Handbook
-Personal handbook on coding for online judges and ACM/ICPC.
+# ACM Cookbook
+This is the handbook I prepared for ACM/ICPC contests (though I'm not good at solving problems.)
