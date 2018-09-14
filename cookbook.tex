@@ -1,0 +1,979 @@
+\documentclass[11pt, a5paper, UTF8]{article}
+\input{preamble}
+
+\title{\textsf{ACM/OJ Handbook}}
+\author{\textsf{Aunt *recovered version}}
+\date{}
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+\section*{Head files}
+\begin{lstlisting}
+#include <set>
+#include <map>
+#include <cmath>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <cstring>
+#include <cstdio>
+#include <cstring>
+#include <iostream>
+#include <algorithm>
+
+using namespace std; //D A N G E R O U S ! ! !
+
+const int MAXN = 100010;
+const int INF = 0x3f3f3f3f;
+\end{lstlisting}
+	To set every element as inf, we just need to do memset(a,0x3f,sizeof(a)). \\
+
+\section{STL Templates}
+
+\subsection{Sort}
+\begin{lstlisting}
+bool compare(int a,int b) {
+  return a < b; //1, 2, 3, ...
+  //return a > b; //..., 3, 2, 1
+}
+sort(a, a+n, compare);
+\end{lstlisting}
+\subsection{QSort}
+\begin{lstlisting}
+int compare(const void *a,const void *b) {
+  return *(int*)a > *(int*)b ? 1 : -1;   
+}
+qsort(a, 20, sizeof(int), compare);
+//qsort(a, 20, sizeof(int), less<int>); or, greater<int>
+\end{lstlisting}
+
+\subsection{Vector}
+\begin{lstlisting}
+//declare
+vector<string> v(5, "hello");
+vector<string> v2(v.begin(), v.end());
+
+//output
+for(vector<string>::iterator it = v.begin();
+      it < v.end(); ++it)
+  cout<<*it<<endl;
+//or
+for(vector<string>::size_type i = 0; i < v.size(); ++i)
+  cout<<v[i]<<endl;
+  
+//sort
+sort(v.begin(), v.end());
+
+//insert
+v.insert(v.begin() + 3, 4, "hello, world");
+//or push at back
+v.push_back("1");
+
+//erase, D A N G E R O U S ! ! !
+vector<string>::iterator it =
+    v.erase(v.begin() + 3, v.begin() + 6);
+//or erase an element of specific key
+for(vector<int>::iterator iter=veci.begin();
+      iter!=veci.end(); ) {
+  if( *iter == 3)
+    iter = veci.erase(iter);
+  else
+    iter ++ ;
+}
+
+//others
+void v.clear();
+bool v.empty();
+type v.front();
+type v.back();
+\end{lstlisting}
+\ 
+\subsection{Map}
+\begin{lstlisting}
+//declare
+map <int, string> mapS;
+map <int, double> mapD;
+
+//insert
+mapS->insert(map <int, string>::value_type(index, x));
+//or, a function
+void map_insert(map <int, string> *mapS,
+                int index, string x) { 
+  mapS->insert(map <int, string>::value_type(index, x));
+}
+
+//find and delete element 
+map <int, string>::iterator iter = mapS.find(450); 
+if (iter != mapS.end()) { 
+  cout << "find the elememt" << endl; 
+  cout << "It is:" << iter->second << endl; 
+  map.erase(iter); 
+} else { 
+  cout << "404" << endl; 
+}
+
+//see element 
+for (map <int, string>::iterator iter = mapS.begin();
+         iter != mapS.end(); iter++) {
+  cout << "| " << iter->first << " | " 
+       << iter->second << " |" << endl;
+}
+\end{lstlisting}
+\ 
+\subsection{Useful Functions}
+\begin{lstlisting}
+min(int a, int b);
+max(int a, int b);
+swap(int a, int b);
+reverse(a, a+n); //1, 2, 3 -> 3, 2, 1
+next_permutation(a, a+n); //needs to be sorted
+//the first key bigger than val (or end)
+itr upper_bound(first, last, value, cmp); 
+//the first key not smaller than val (or end)
+itr lower_bound(first, last, value, cmp); 
+\end{lstlisting}
+
+\ 
+\section{Prime Number}
+\begin{lstlisting}
+int prime[MAXN];  
+bool notPrime[MAXN];
+
+int sieve(int n){
+  int p = 0;
+  memset(notPrime, 0, sizeof(notPrime));
+  notPrime[0] = notPrime[1] = true;
+  for (int i = 2; i <= n; ++i){
+    if(!notPrime[i]){
+      prime[p++] = i;
+      for(int j = i + i; j <= n; j += i)
+        notPrime[j] = true;
+    }
+  }
+  return p;
+}
+\end{lstlisting}
+\ 
+\section{Fast Power}
+	$x$ is base, $n$ is power.
+\begin{lstlisting}
+long long powerMod(long long x, long long n) {
+  long long res = 1;
+  while (n > 0){
+    if  (n & 1) //n is odd
+      res = res * x;
+    x = x * x;
+    n >>= 1; //n = n / 2;
+  }
+  return res;
+}
+\end{lstlisting}
+
+\section{GCD and LCM}
+\subsection{Greatest Common Divisor}
+\begin{lstlisting}
+int gcd(int big, int small) { //non-recursive
+  if (small > big) swap(big, small);
+  int temp;
+  while (small != 0){
+    if (small > big) swap(big, small);
+    temp = big % small;
+    big = small;
+    small = temp;
+  }
+  return(big);
+}
+
+int gcd(int a, int b) {  
+ if (a < b)  
+  swap(a, b);  
+  
+ if (b == 0)  
+  return a;  
+ else  
+  return gcd(b, a%b);  
+}
+
+int ngcd(int *a, int n) {
+ if (n == 1)  
+  return *a;  
+  
+ return gcd(a[n-1], ngcd(a, n-1));  
+}  
+\end{lstlisting}
+\subsection{Least Common Multiple}
+\begin{lstlisting}
+int lcm(int a, int b)  
+{  
+ return a*b/gcd(a, b);  
+} 
+
+int nlcm(int *a, int n) { 
+ if (n == 1)  
+  return *a;  
+ else  
+  return lcm(a[n-1], nlcm(a, n-1));  
+}
+\end{lstlisting}
+\ 
+\section{Permutation}
+	$n$ numbers in the list, the first $k$ of them remains unchanged.
+\begin{lstlisting}
+void Pern(int list[], int k, int n) {
+  if (k == n - 1) {
+    for (int i = 0; i < n; i++) {
+      printf("%d", list[i]);
+    }
+    printf("\n");
+  }else {
+    for (int i = k; i < n; i++) {
+      swap(list[k], list[i]);
+      Pern(list, k + 1, n);
+      swap(list[k], list[i]);
+    }
+  }
+}
+\end{lstlisting}
+
+\section{Binary Search}
+	$left$ is the first element, $right$ is the \textbf{next element} of the end. $x$ is the target.
+\begin{lstlisting}
+int bsearch(int *A, int left, int right, int x) {
+  int m;
+  while (left < right){
+    m = left + (right - left) / 2;
+    if (A[m] >= x)  right = m;
+    else left = m + 1;  
+    //To find an upper_bound, switch to:
+    //if (A[m] <= v) x = m+1; else y = m;   
+  }
+  return left;
+}
+\end{lstlisting}
+
+\section{Union Find Set}
+	The father of nodes are updated during search.
+\begin{lstlisting}
+int father[maxn];
+
+void makeSet() {  
+  for (int i = 0; i < maxn; i++)   
+    father[i] = i;  
+}
+
+int findRoot(int x) {   //avoid recursion and RE
+  int root = x;
+  while (root != father[root]) {
+    root = father[root];  
+  }  
+  while (x != root) {  
+    int tmp = father[x];  
+    father[x] = root;
+    x = tmp;  
+  }  
+  return root;  
+}  
+
+void Union(int x, int y) {
+  int a, b;  
+  a = findRoot(x);  
+  b = findRoot(y);  
+  father[a] = b;
+}  
+\end{lstlisting}
+
+\section{Minimum Spanning Tree}
+\subsection{Kruskal} 
+	Used for sparse graphs.
+\begin{lstlisting}
+void Kruskal() {  
+  ans = 0;  
+  for (int i = 0; i<len; i++) {  
+    if (Find(edge[i].a) != Find(edge[i].b)) {  
+      Union(edge[i].a, edge[i].b);  
+      ans += edge[i].len;  
+    }  
+  }  
+}  
+\end{lstlisting}
+\subsection{Prim}
+	Used for dense graphs.
+\begin{lstlisting}
+struct node {  
+  int v, len;  
+  node(int v = 0, int len = 0) :v(v), len(len) {}  
+  bool operator < (const node &a)const {  //define <
+  return len> a.len;  
+  }  
+};
+
+vector<node> G[maxn];
+int vis[maxn];
+int dis[maxn];
+
+void init() {  
+  for (int i = 0; i<maxn; i++) {  
+  G[i].clear();  
+  dis[i] = INF;  
+  vis[i] = false;  
+  }  
+}  
+
+int Prim(int s) {  
+  priority_queue<node>Q; 
+  int ans = 0;  
+  Q.push(node(s,0));  //start node
+  
+  while (!Q.empty()) {   
+  node now = Q.top();
+  Q.pop();//the minimum distance
+  
+  int v = now.v;  
+  if (vis[v]) continue;  //skip if visited
+  vis[v] = true;  //mark visited
+  
+  ans += now.len;  
+  //update the tree
+  for (int i = 0; i<G[v].size(); i++) {
+    int v2 = G[v][i].v;  
+    int len = G[v][i].len;  
+    if (!vis[v2] && dis[v2] > len) {   
+    dis[v2] = len;
+    //insert into the queue and sort
+    Q.push(node(v2, dis[v2]));  
+    }  
+  }  
+  }  
+  return ans; 
+}  
+\end{lstlisting}
+
+\section{Single-Source Shortest Path}
+\subsection{Bellman-Ford}.
+\begin{lstlisting}
+
+\end{lstlisting}
+\subsection{Dijkstra}
+	Used for non-negative weights. Complexity $O(e\lg{n})$.
+\begin{lstlisting}
+struct node {  
+  int v, len;  
+  node(int v = 0, int len = 0) :v(v), len(len) {}  
+  bool operator < (const node &a)const { 
+    return len > a.len;  
+  }  
+};  
+
+vector<node>G[maxn];  
+bool vis[maxn];  
+int dis[maxn];
+
+void init() {  
+  for (int i = 0; i<maxn; i++) {  
+    G[i].clear();  
+    vis[i] = false;  
+    dis[i] = INF;  
+  }  
+}  
+int dijkstra(int s, int e) {  
+  priority_queue<node>Q;  
+  Q.push(node(s, 0)); //insert and sort  
+  dis[s] = 0;  
+  while (!Q.empty()) {  
+    node now = Q.top();   //get the minimum
+    Q.pop();  
+    int v = now.v;  
+    if (vis[v]) continue;   //skip
+    vis[v] = true;      //mark
+    for (int i = 0; i<G[v].size(); i++) { //update
+      int v2 = G[v][i].v;  
+      int len = G[v][i].len;  
+      if (!vis[v2] && dis[v2] > dis[v] + len) {  
+        dis[v2] = dis[v] + len;  
+        Q.push(node(v2, dis[v2]));  
+      }  
+    }  
+  }  
+  return dis[e];  
+}  
+\end{lstlisting}
+\subsection{SFPA}
+	Can deal with negative weights.
+\begin{lstlisting}
+vector<node> G[maxn];
+bool inqueue[maxn];
+int dist[maxn];
+
+void init() {  
+  for(int i = 0 ; i < maxn ; ++i){  
+    G[i].clear();  
+    dist[i] = INF;  
+  }  
+}
+
+int SPFA(int s,int e) {  
+  int v1,v2,weight;  
+  queue<int> Q;  
+  memset(inqueue,false,sizeof(inqueue));
+  memset(cnt,0,sizeof(cnt)); //times of insertion 
+  dist[s] = 0;  
+  Q.push(s); //push the start
+  inqueue[s] = true; //mark 
+  while(!Q.empty()){  
+    v1 = Q.front();  
+    Q.pop();  
+    inqueue[v1] = false; //cancel mark
+    for(int i = 0 ; i < G[v1].size() ; ++i){ //traverse
+      v2 = G[v1][i].vex;  
+      weight = G[v1][i].weight;  
+      if(dist[v2] > dist[v1] + weight){ //relaxation
+        dist[v2] = dist[v1] + weight;  
+        if(inqueue[v2] == false){  //insert again
+          inqueue[v2] = true;  
+          //cnt[v2]++;  //negative circle  
+          //if(cnt[v2] > n) return -1;  
+          Q.push(v2);  
+        } } }  
+  }  
+  return dist[e];  
+}
+\end{lstlisting}
+\subsection{Floyd-Warshall}
+	The simplest and worst. Complexity $O(n^3)$.
+\begin{lstlisting}
+for (int i = 0; i < n; i++) {  
+  for (int j = 0; j < n; j++)  
+    scanf("%lf", &dis[i][j]);  
+}  
+for (int k = 0; k < n; k++) {  
+  for (int i = 0; i < n; i++) {  
+    for (int j = 0; j < n; j++) {  
+      dis[i][j] = min(dis[i][j], dis[i][k]+dis[k][j]);  
+    }  
+  }
+}
+\end{lstlisting}
+
+\section{Bipartite Graph}
+\subsection{Judgement and Bipartite}
+\begin{lstlisting}
+int bipartite(int s) {  
+  int u, v;  
+  queue<int>Q;  
+  color[s] = 1;  
+  Q.push(s);  
+  while (!Q.empty()) {  
+    u = Q.front();  
+    Q.pop();  
+    for (int i = 0; i < G[u].size(); i++) {  
+      v = G[u][i];  
+      if (color[v] == 0) {  
+        color[v] = -color[u];  
+        Q.push(v);  
+      }  
+      else if (color[v] == color[u])  
+        return 0;  
+    }  
+  }  
+  return 1;  
+}  
+\end{lstlisting}
+\subsection{Hungary Algorithm}
+	Find maximum match.
+\begin{lstlisting}
+vector<int> G[maxn];  
+bool inpath[maxn];
+int match[maxn];
+
+void init() {  
+  memset(match, -1, sizeof(match));  
+  for (int i = 0; i < maxn; ++i) {  
+    G[i].clear();  
+  }  
+}  
+
+bool findpath(int k) {  
+  for (int i = 0; i < G[k].size(); ++i) {  
+    int v = G[k][i];  
+    if (!inpath[v]) {  
+      inpath[v] = true;   
+      //using recursion to find a way of matching
+      if (match[v] == -1 || findpath(match[v])) {
+        match[v] = k;
+        return true;  
+      }  
+    }  
+  }  
+  return false;  
+}  
+
+void hungary() {  
+  int cnt = 0;  
+  for (int i = 1; i <= m; i++) {
+    memset(inpath, false, sizeof(inpath)); 
+    if (findpath(i)) cnt++;  
+  }  
+  cout << cnt << endl;  
+}  
+\end{lstlisting}
+
+\section{Backpack Problems}
+\subsection{0-1 Backpack}
+\begin{lstlisting}
+void bag01(int cost,int weight) {  
+  for(i = v; i >= cost; --i)  
+    if(dp[i]<dp[i-cost]+weight)  
+      dp[i]=dp[i-cost]+weight; 
+}  
+\end{lstlisting}
+\subsection{Complete Backpack}
+\begin{lstlisting}
+void complete(int cost,int weight) {  
+  for(i=cost;i<=v;i++)  
+    if(dp[i]<dp[i-cost]+weight)  
+      dp[i]=dp[i-cost]+weight;  
+}  
+\end{lstlisting}
+\subsection{Multiple Backpack}
+\begin{lstlisting}
+void multiply(int cost,int weight,int amount) {  
+  if(cost*amount>=v)  
+    complete(cost,weight);  
+  else{  
+    k=1;  
+    while(k<amount){  
+      bag01(k*cost,k*weight);  
+      amount-=k;  
+      k+=k;  
+    }  
+    bag01(cost*amount,weight*amount);  
+  }  
+}  
+\end{lstlisting}
+\ 
+\section{Big Number}
+	The first digit(0) stores how long the number is, the rest stores digits of the number. Use integer to avoid overflow!
+\begin{lstlisting}
+void add(int *a, int *b) { //a = a + b
+  int length = max(a[0], b[0]);
+  int sum[105] = {};
+  for (int i = 1; i <= length; ++i) {
+    sum[i] = a[i] + b[i];
+  }
+  for (int i = 1; i <= length; ++i) {
+    sum[i + 1] += sum[i] / 10;
+    sum[i] = sum[i] % 10;
+  }
+  if (sum[length + 1] > 0) sum[0] = length + 1;
+  else sum[0] = length;
+
+  for (int i = 0; i <= sum[0]; ++i) {
+    a[i] = sum[i];
+  }
+}
+
+void multiply(int *a, int *b) {
+  //if (a[1] == 0 && a[2] == 0) getint();
+  int length1 = a[0];
+  int length2 = b[0];
+  int sum[305] = {};
+  int pos = 0;
+  for (int i = 1; i <= length1; ++i) {
+    pos = i;
+    for (int j = 1; j <= length2; ++j) {
+      sum[pos] += a[i] * b[j];
+      pos++;
+    }
+  }
+  //at this moment, pos is the new length.
+  for (int i = 1; i <= pos+100; ++i) {
+    sum[i + 1] += sum[i] / 10;
+    sum[i] = sum[i] % 10;
+  }
+  pos = length1 + length2 + 100;
+  while (sum[pos] == 0) pos--;
+  sum[0] = pos;
+
+  for (int i = 0; i <= sum[0]; ++i) {
+    a[i] = sum[i];
+  }
+}
+
+void printnum(int* a){
+  for (int i = a[0]; i > 0; --i) {
+    cout << (int) a[i];
+  }
+}
+\end{lstlisting}
+\ 
+\section{LIS and LCS}
+\subsection{Longest Increasing Subsequence}
+\begin{lstlisting}
+void solve() {
+  for(int i = 0; i < n; ++i){  
+    dp[i] = 1;  
+    for(int j = 0; j < i; ++j){  
+      if(a[j] < a[i]){  
+        dp[i] = max(dp[i], dp[j] + 1);  
+      }
+    }
+  }
+}  
+\end{lstlisting}
+\ 
+\subsection{Longest Common Subsequence}
+\begin{lstlisting}
+void solve() {  
+  for (int i = 0; i < n; ++i) {  
+    for (int j = 0; j < m; ++j) {  
+      if (s1[i] == s2[j]) {  
+        dp[i + 1][j + 1] = dp[i][j] + 1;  
+      } else {  
+        dp[i + 1][j + 1] = max(dp[i][j + 1],
+                               dp[i + 1][j]);  
+      }
+    } 
+  }
+}  
+\end{lstlisting}
+\ 
+\section{Geometry}
+\subsection{Base}
+\begin{lstlisting}
+struct node {  
+  double x; 
+  double y; 
+};  
+
+typedef node Vector;
+
+Vector operator + (Vector A, Vector B) {
+  return Vector(A.x + B.x, A.y + B.y); 
+}  
+Vector operator - (Point A, Point B) {
+  return Vector(A.x - B.y, A.y - B.y);
+}  
+Vector operator * (Vector A, double p) {
+  return Vector(A.x*p, A.y*p);
+}  
+Vector operator / (Vector A, double p) {
+  return Vector(A.x / p, A.y*p); 
+}  
+
+double Dot(Vector A, Vector B) {
+  return A.x*B.x + A.y*B.y;
+  } 
+double Length(Vector A) {
+  return sqrt(Dot(A, A));
+} 
+double Angle(Vector A, Vector B) {
+  return acos(Dot(A, B) / Length(A) / Length(B));
+}
+
+double Cross(Vector A, Vector B) {
+  return A.x*B.y - A.y*B.x;  
+}  
+
+Vector Rotate(Vector A, double rad) {  
+  return Vector(A.x*cos(rad) - A.y*sin(rad),
+          A.x*sin(rad) + A.y*cos(rad));  
+}  
+
+Point getLineIntersection(Point P, Vector v,
+              Point Q, Vector w) {   
+  Vector u = P - Q;   
+  double t = Cross(w, u) / Cross(v, w);  
+  return P + v*t;
+}  
+\end{lstlisting}
+\ 
+\subsection{Size of a polygon}
+\begin{lstlisting}
+node G[maxn];  
+int n;
+
+double getSize() {  
+  double sum = 0;  
+  G[n].x = G[0].x;  
+  G[n].y = G[0].y;  
+  for (int i = 0; i < n; i++) {   
+      sum += Cross(G[i], G[i + 1] % n);  
+  }
+  //otherwise:
+  sum = sum / 2.0;  
+  return sum;
+}
+\end{lstlisting}
+\subsection{Judge two line intersects}
+\begin{lstlisting}
+double Cross_Prouct(node A,node B,node C) {//BA Cross CA
+    return (B.x-A.x)*(C.y-A.y)-(B.y-A.y)*(C.x-A.x);      
+}      
+bool Intersect(node A,node B,node C,node D) { 
+  if(min(A.x,B.x)<=max(C.x,D.x)&&     
+      min(C.x,D.x)<=max(A.x,B.x)&&      
+      min(A.y,B.y)<=max(C.y,D.y)&&      
+      min(C.y,D.y)<=max(A.y,B.y)&&      
+      Cross_Prouct(A,B,C)*Cross_Prouct(A,B,D)<0&&      
+      Cross_Prouct(C,D,A)*Cross_Prouct(C,D,B)<0)      
+    return true;      
+  else return false;      
+}    
+\end{lstlisting}
+
+\section{KMP}
+\begin{lstlisting}
+void getnext(char str[maxn], int nextt[maxn]) {
+  int j = 0, k = -1;
+  nextt[0] = -1;
+  while (j < m) {
+    if (k == -1 || str[j] == str[k]) {
+      j++;
+      k++;
+      nextt[j] = k;
+    }
+    else
+      k = nextt[k];
+  }
+}
+
+void kmp(int a[maxn], int b[maxn]) {  
+  int nextt[maxm];  
+  int i = 0, j = 0;  
+  getnext(b, nextt);  
+  while (i < n) {  
+    if (j == -1 || a[i] == b[j]) {  
+      j++;  
+      i++;  
+    }  
+    else {
+      j = nextt[j];  
+    }  
+    if (j == m) {  
+      printf("%d\n", i - m + 1);  
+      return;  
+    }  
+  }  
+  printf("-1\n");
+}  
+\end{lstlisting}
+
+\section{Tree}
+\subsection{Segment Tree (node add)}
+\begin{lstlisting}
+struct node
+{
+  int left, right;
+  int max, sum;
+};
+
+node tree[maxn << 2];
+int a[maxn];
+int n;
+int k = 1;
+int p, q;
+string str;
+
+void build(int m, int l, int r) {
+  tree[m].left = l;
+  tree[m].right = r;
+  if (l == r){
+    tree[m].max = a[l];
+    tree[m].sum = a[l];
+    return;
+  }
+  int mid = (l + r) >> 1;
+  build(m << 1, l, mid);
+  build(m << 1 | 1, mid + 1, r);
+  tree[m].max = max(tree[m << 1].max, 
+                    tree[m << 1 | 1].max);
+  tree[m].sum = tree[m << 1].sum 
+                 + tree[m << 1 | 1].sum;
+}
+
+//a is position, val is value
+void update(int m, int a, int val) {
+  if (tree[m].left == a && tree[m].right == a){
+    tree[m].max += val;
+    tree[m].sum += val;
+    return;
+  }
+  int mid = (tree[m].left + tree[m].right) >> 1;
+  if (a <= mid){
+    update(m << 1, a, val);
+  }
+  else{
+    update(m << 1 | 1, a, val);
+  }
+  tree[m].max = max(tree[m << 1].max, 
+                    tree[m << 1 | 1].max);
+  tree[m].sum = tree[m << 1].sum 
+                 + tree[m << 1 | 1].sum;
+}
+
+int querySum(int m, int l, int r)
+{
+  if (l == tree[m].left && r == tree[m].right){
+    return tree[m].sum;
+  }
+  int mid = (tree[m].left + tree[m].right) >> 1;
+  if (r <= mid){
+    return querySum(m << 1, l, r);
+  }
+  else if (l > mid){
+    return querySum(m << 1 | 1, l, r);
+  }
+  return querySum(m << 1, l, mid) 
+          + querySum(m << 1 | 1, mid + 1, r);
+}
+
+int queryMax(int m, int l, int r)
+{
+  if (l == tree[m].left && r == tree[m].right){
+    return tree[m].max;
+  }
+  int mid = (tree[m].left + tree[m].right) >> 1;
+  if (r <= mid){
+    return queryMax(m << 1, l, r);
+  }
+  else if (l > mid){
+    return queryMax(m << 1 | 1, l, r);
+  }
+  return max(queryMax(m << 1, l, mid), 
+             queryMax(m << 1 | 1, mid + 1, r));
+} 
+
+build(1,1,n);  
+update(1,a,b);  
+query(1,a,b);  
+\end{lstlisting}
+\ 
+\subsection{Segment Tree (section add)}
+\begin{lstlisting}
+int t,n,q;  
+ll anssum;  
+
+struct node{  
+  ll l,r;  
+  ll addv,sum;  
+}tree[maxn<<2];  
+
+void maintain(int id) {  
+  if(tree[id].l >= tree[id].r)  
+    return ;  
+  tree[id].sum = tree[id<<1].sum + tree[id<<1|1].sum;  
+}  
+
+void pushdown(int id) {  
+  if(tree[id].l >= tree[id].r)  
+    return ;  
+  if(tree[id].addv){  
+    int tmp = tree[id].addv;  
+    tree[id<<1].addv += tmp;  
+    tree[id<<1|1].addv += tmp;  
+    tree[id<<1].sum += 
+        (tree[id<<1].r - tree[id<<1].l + 1)*tmp;  
+    tree[id<<1|1].sum += 
+        (tree[id<<1|1].r - tree[id<<1|1].l + 1)*tmp;  
+    tree[id].addv = 0;  
+  }  
+}  
+
+void build(int id,ll l,ll r) {  
+  tree[id].l = l;  
+  tree[id].r = r;  
+  tree[id].addv = 0;  
+  tree[id].sum = 0;  
+  if(l==r)  {  
+    tree[id].sum = 0;  
+    return ;  
+  }  
+  ll mid = (l+r)>>1;  
+  build(id<<1,l,mid);  
+  build(id<<1|1,mid+1,r);  
+  maintain(id);  
+}  
+
+void updateAdd(int id,ll l,ll r,ll val) {  
+  if(tree[id].l >= l && tree[id].r <= r)  
+  {  
+    tree[id].addv += val;  
+    tree[id].sum += (tree[id].r - tree[id].l+1)*val;  
+    return ;  
+  }  
+  pushdown(id);  
+  ll mid = (tree[id].l+tree[id].r)>>1;  
+  if(l <= mid)  
+    updateAdd(id<<1,l,r,val);  
+  if(mid < r)  
+    updateAdd(id<<1|1,l,r,val);  
+  maintain(id);  
+}  
+
+void query(int id,ll l,ll r) {  
+  if(tree[id].l >= l && tree[id].r <= r){  
+    anssum += tree[id].sum;  
+    return ;  
+  }  
+  pushdown(id);  
+  ll mid = (tree[id].l + tree[id].r)>>1;  
+  if(l <= mid)  
+    query(id<<1,l,r);  
+  if(mid < r)  
+    query(id<<1|1,l,r);  
+  maintain(id);  
+}  
+
+int main() {  
+  scanf("%d",&t);  
+  int kase = 0 ;  
+  while(t--){  
+    scanf("%d %d",&n,&q);  
+    build(1,1,n);  
+    int id;  
+    ll x,y;  
+    ll val;  
+    printf("Case %d:\n",++kase);  
+    while(q--){  
+      scanf("%d",&id);  
+      if(id==0){  
+        scanf("%lld %lld %lld",&x,&y,&val);  
+        updateAdd(1,x+1,y+1,val);  
+      }  
+      else{  
+        scanf("%lld %lld",&x,&y);  
+        anssum = 0;  
+        query(1,x+1,y+1);  
+        printf("%lld\n",anssum);  
+      } 
+    } 
+  }  
+  return 0;  
+}  
+\end{lstlisting}
+\ 
+\subsection{Binary Indexed Tree}
+\begin{lstlisting}
+int lowbit(const int t) {
+  return t & (-t);
+}
+
+void insert(int t, int d) {
+  while (t <= n){
+    a[t] += d;
+    t = t + lowbit(t);
+  }
+}
+
+ll getSum(int t) {
+  ll sum = 0;
+  while (t > 0){
+    sum += a[t];
+    t = t - lowbit(t);
+  }
+  return sum;
+}
+\end{lstlisting}
+\end{document}
